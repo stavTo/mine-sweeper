@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Mine Sweeper</title>
+</head>
+
+<body onload="onInit()">
+    <h1>Mine Sweeper</h1>
+    <div>
+        <label>Beginner(2 mines): </label>
+        <input type="radio" name="level" class="beginner" onclick="changeSize(this)">
+        <label>Medium(14 mines) </label>
+        <input type="radio" name="level" class="medium" onclick="changeSize(this)">
+        <label>Expert(32 mines)</label>
+        <input type="radio" name="level" class="expert" onclick="changeSize(this)">
+    </div>
+
+    <h2 class="lives">Lives :<span>3</span></h2>
+    <h2 class="hints">Hints :<span>3</span></h2>
+
+
+
+    <button onclick="onInit()" class="smiley-btn">😄</button>
+
+
+    <table>
+        <tbody class="board"></tbody>
+    </table>
+
+    <div class="modal">
+        <h3 class="msg"></h3>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/game.js"></script>
+
+</body>
+
+</html>

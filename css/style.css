@@ -1,0 +1,44 @@
+body {
+    background-color: black;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+table {
+    margin: auto;
+
+}
+
+.cell {
+    width: 40px;
+    height: 40px;
+    background-color: aquamarine;
+}
+
+.cell img {
+    width: 25px;
+    height: auto;
+}
+
+.shown {
+    background-color: brown;
+}
+
+.flag {
+    background: #fff url("../img/flag.png") center center/cover no-repeat;
+
+}
+
+.modal {
+    display: none;
+    border: solid 3px grey;
+    width: 300px;
+    height: 200px;
+    background-color: rgb(222, 226, 228);
+    color: black;
+    font-size: 32px;
+    margin-top: 100px;
+    position: absolute;
+    top: 200px;
+}
