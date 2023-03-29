@@ -107,16 +107,12 @@ function onCellClicked(elCell, i, j) {
         firstI = i
         firstJ = j
         gBoard = buildBoard()
-        gBoard[i][j].isShown = true
-        gGame.shownCount++
-        elCell.classList.add('shown')
-        renderCell(i, j)
     }
     if (gBoard[i][j].isShown) return // to not count isShown again
     gBoard[i][j].isShown = true
     elCell.classList.add('shown')
     gGame.shownCount++
-    if (gBoard[i][j].minesAroundCount===0) { // equal to 0 
+    if (gBoard[i][j].minesAroundCount===0 && !gBoard[i][j].isMine) { // equal to 0 
         expandShown( i, j)
     }
     if (gBoard[i][j].isMine) {
@@ -189,13 +185,13 @@ function updateLives() {
     checkGameOver()
 }
 
-// function expandShown(rowIdx, colIdx) {
-//     for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
-//         if (i < 0 || i >= gBoard.length) continue
-//         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
-//             if (i === rowIdx && j === colIdx) continue
-//             if (j < 0 || j >= gBoard[0].length) continue
-//             renderCell(i,j)  
-//         }
-//     }  
-// }
+function expandShown(rowIdx, colIdx) {
+    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+        if (i < 0 || i >= gBoard.length) continue
+        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+            if (i === rowIdx && j === colIdx) continue
+            if (j < 0 || j >= gBoard[0].length) continue
+            renderCell(i,j)  
+        }
+    }  
+}

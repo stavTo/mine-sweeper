@@ -12,9 +12,9 @@ function getRandomInt(min, max) {
 }
 
 function renderCell(i , j) {
-  if (gBoard[i][j].minesAroundCount === 0) return
   const elCell = document.querySelector(`.cell-${i}-${j}`)
   elCell.classList.add('shown')
+  if (gBoard[i][j].minesAroundCount === 0) return
   elCell.innerHTML = gBoard[i][j].minesAroundCount
 }
 
