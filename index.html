@@ -11,6 +11,11 @@
 
 <body onload="onInit()">
     <h1>Mine Sweeper</h1>
+
+    <div id="timerBox">
+        <span id="timer">00:00:00</span>
+    </div>
+
     <div>
         <label>Beginner(2 mines): </label>
         <input type="radio" name="level" class="beginner" onclick="changeSize(this)">
@@ -21,7 +26,8 @@
     </div>
 
     <h2 class="lives">Lives :<span>3</span></h2>
-    <h2 class="hints">Hints :<span>3</span></h2>
+    <h2 class="hints">Hints :<span class="num-of-hints">3</span><span><img src="/img/hint.jpg"
+                onclick="hints(this)"></span></h2>
 
 
 

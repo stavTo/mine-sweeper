@@ -42,3 +42,13 @@ table {
     position: absolute;
     top: 200px;
 }
+
+.hints img {
+    width: 30px;
+    height: 30px;
+    padding: 10px;
+}
+
+.use-hint {
+    background-color: gold;
+}
