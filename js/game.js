@@ -6,6 +6,8 @@ var isHint
 
 var gLIVE = 3
 var gHint = 3
+var gSafeClick = 3
+
 var checkFirstClick = 0
 const MINE_IMG = '<img src="img/mine.jpg">'
 // const FLAG_IMG = '<img src="img/flag.png">'
@@ -37,6 +39,9 @@ function onInit() {
     renderBoard(gBoard)
     gHint = 3
     gLIVE = 3
+    gSafeClick = 3
+    updateHints()
+    updateSafeClick
     updateLives()
     preventDefault()
 
@@ -119,10 +124,10 @@ function onCellClicked(elCell, i, j) {
         gHint--
         updateHints()
 
-    } 
+    } else {
     gGame.shownCount++
     gBoard[i][j].isShown = true
-
+    }
     if (gBoard[i][j].minesAroundCount === 0 && !gBoard[i][j].isMine) { // equal to 0 
         gFirstRuc = 0
         openNeg(i, j)
@@ -131,9 +136,6 @@ function onCellClicked(elCell, i, j) {
         updateLives()
     } 
     renderCell(i,j)
-    
-    console.log(gHint)
-    console.log(gGame.shownCount)
     checkGameOver()
 }
 
@@ -147,8 +149,8 @@ function onCellMarked(elCell, i, j) {
         gGame.markedCount++
 
     }
-    console.log(gGame.markedCount)
     elCell.classList.toggle('flag')
+    checkGameOver()
 }
 
 function preventDefault() {
@@ -175,13 +177,17 @@ function checkGameOver() {
     if (!gLIVE) {
         isVictory = false
         gameOver()
+    } else {
+        // console.log('shown count', gGame.shownCount)
+        // console.log('marked count', gGame.markedCount)
+        // console.log('glevel', gLevel.SIZE**2)
+        if (gGame.shownCount + gGame.markedCount === gLevel.SIZE ** 2 && gGame.shownCount > gGame.markedCount) {
+            isVictory = true
+            gameOver()
+        }
+        
     }
-    console.log('hhh')
-    if (gGame.shownCount + gGame.markedCount === gLevel.SIZE ** 2 && gGame.shownCount > gGame.markedCount) {
-        console.log('fff')
-        isVictory = true
-        gameOver()
-    }
+
 }
 
 function gameOver() {
@@ -203,6 +209,10 @@ function updateHints() {
     const elHint = document.querySelector('h2 .num-of-hints')
     elHint.innerHTML = gHint
 }
+function updateSafeClick() {
+    const elSafeClick = document.querySelector('.num-of-safeclick')
+    elSafeClick.innerHTML = gSafeClick
+}
 
 
 function openNeg(rowIdx, colIdx) {
@@ -211,7 +221,7 @@ function openNeg(rowIdx, colIdx) {
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
             if (i === rowIdx && j === colIdx) continue
             if (j < 0 || j >= gBoard[0].length) continue
-            if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked) {
+            if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked && !isHint) {
                 gBoard[i][j].isShown = true
                 gGame.shownCount++
             }
@@ -224,11 +234,10 @@ function closeNeg(rowIdx, colIdx) {
     for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
         if (i < 0 || i >= gBoard.length) continue
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
-            // if (i === rowIdx && j === colIdx) continue
             if (j < 0 || j >= gBoard[0].length) continue
-            gBoard[i][j].isShown = false
-            gGame.shownCount--
             deleteRenderCell(i, j)
+            // gBoard[i][j].isShown = false
+            // gGame.shownCount--
         }
     }
 }
@@ -250,7 +259,46 @@ function hints(elHint) {
     }
 }
 
+function safeClick() {
+    if (!gSafeClick) return
+    const safeCell = findRandomSafeCell()
+    const elSafeCell = document.querySelector(`.cell-${safeCell.i}-${safeCell.j}`)
+    elSafeCell.classList.add('safe-click')
+    gSafeClick--
+    updateSafeClick()
+    setTimeout(hideSafeClick,2000,elSafeCell) 
+}
 
+function hideSafeClick(elSafeCell) {
+    elSafeCell.classList.remove('safe-click')
+}
+
+
+function findRandomSafeCell () {
+    var safeCells = [] 
+    for (var i = 0; i < gLevel.SIZE; i++) {
+        for (var j = 0; j < gLevel.SIZE; j++) {
+            var cell = gBoard[i][j]
+            if (!cell.isMine && !cell.isShown) safeCells.push({i , j})   
+        }
+    }
+    const randIdx = getRandomInt(0, safeCells.length)
+    return safeCells[randIdx]
+    }
+
+
+
+
+    function megaHint(rowIdxStart, rowIdxEnd, colIdxStart, colIdxEnd) {
+        for (var i = rowIdxStart; i <= rowIdxEnd; i++) {
+            for (var j = colIdxStart; j <= colIdxEnd; j++) {
+                gBoard[i][j].isShown = true
+                renderCell(i,j)
+                setTimeout(deleteRenderCell,2000,i, j)
+                gBoard[i][j].isShown = false
+            }
+        }
+    }
 
 
 
@@ -292,9 +340,6 @@ function hints(elHint) {
 // }
 
 
-
-
-
 // function numOfEmptyNeg(rowIdx, colIdx) {
 //     var count = 0
 //     for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
@@ -309,6 +354,7 @@ function hints(elHint) {
 //     }
 //     return count
 // }
+
 // function expandShown(currI, currJ, prevI, prevJ) {
 //     gFirstRuc++
 //     if (numOfEmptyNeg(currI, currJ) === 0 || numOfEmptyNeg(currI, currJ) === 1 && gFirstRuc > 1)

@@ -13,7 +13,7 @@ table {
 .cell {
     width: 40px;
     height: 40px;
-    background-color: aquamarine;
+    background-color: gainsboro;
 }
 
 .cell img {
@@ -22,7 +22,7 @@ table {
 }
 
 .shown {
-    background-color: brown;
+    background-color:burlywood;
 }
 
 .flag {
@@ -51,4 +51,8 @@ table {
 
 .use-hint {
     background-color: gold;
+}
+
+.safe-click {
+    border: yellow 2px solid;
 }

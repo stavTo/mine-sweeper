@@ -12,10 +12,7 @@
 <body onload="onInit()">
     <h1>Mine Sweeper</h1>
 
-    <div id="timerBox">
-        <span id="timer">00:00:00</span>
-    </div>
-
+    
     <div>
         <label>Beginner(2 mines): </label>
         <input type="radio" name="level" class="beginner" onclick="changeSize(this)">
@@ -24,9 +21,13 @@
         <label>Expert(32 mines)</label>
         <input type="radio" name="level" class="expert" onclick="changeSize(this)">
     </div>
+    
+    <div id="timerBox">
+        <span id="timer">00:00:00</span>
+    </div>
 
     <h2 class="lives">Lives :<span>3</span></h2>
-    <h2 class="hints">Hints :<span class="num-of-hints">3</span><span><img src="/img/hint.jpg"
+    <h2 class="hints">Hints :<span class="num-of-hints">3</span><span><img src="img/hint.jpg"
                 onclick="hints(this)"></span></h2>
 
 
@@ -38,11 +39,14 @@
         <tbody class="board"></tbody>
     </table>
 
+    <button onclick="safeClick()">Safe Click :<span class="num-of-safeclick">3</span></button>
+
     <div class="modal">
         <h3 class="msg"></h3>
     </div>
 
     <script src="js/utils.js"></script>
+    <script src="js/timer.js"></script>
     <script src="js/game.js"></script>
 
 </body>

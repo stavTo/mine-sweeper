@@ -1,8 +1,5 @@
 'use strict'
 
-var gStartTime
-var gIntervalId
-
 function getClassName(location) {
   const cellClass = 'cell-' + location.i + '-' + location.j
   return cellClass
@@ -24,11 +21,7 @@ function getRandomInt(min, max) {
 //   elCell.innerHTML = gBoard[i][j].minesAroundCount
 // }
 
-function deleteRenderCell(i, j) {
-  const elCell = document.querySelector(`.cell-${i}-${j}`)
-  elCell.classList.remove('shown')
-  elCell.innerHTML = ''
-}
+
 
 
 function openModal(msg) {
@@ -70,29 +63,11 @@ function renderCell(i, j) {
   else elCell.innerHTML = gBoard[i][j].minesAroundCount
 }
 
-
-function startTimer() {
-  gStartTime = Date.now();
-  gIntervalId = setInterval(updateTimer, 10);
+function deleteRenderCell(i, j) {
+  const elCell = document.querySelector(`.cell-${i}-${j}`)
+  if (gBoard[i][j].isShown) return
+  elCell.classList.remove('shown')
+  elCell.innerHTML = ''
 }
 
-function stopTimer() {
-  clearInterval(gIntervalId);
-}
 
-function updateTimer() {
-  var elapsedTime = Date.now() - gStartTime;
-  var minutes = Math.floor(elapsedTime / (1000 * 60));
-  var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
-  var milliseconds = Math.floor((elapsedTime % 1000) / 10);
-  document.getElementById('timer').textContent =
-    formatTime(minutes) +
-    ':' +
-    formatTime(seconds) +
-    ':' +
-    formatTime(milliseconds);
-}
-
-function formatTime(time) {
-  return (time < 10 ? '0' : '') + time;
-}
