@@ -40,14 +40,17 @@ function changeSize(elLevel) {
   if (elLevel.className === 'beginner') {
     gLevel.SIZE = 4
     gLevel.MINES = 2
+    gLevel.NAME = 'beginner'
     onInit()
   } else if (elLevel.className === 'medium') {
     gLevel.SIZE = 8
     gLevel.MINES = 14
+    gLevel.NAME = 'medium'
     onInit()
   } else if (elLevel.className === 'expert') {
     gLevel.SIZE = 12
     gLevel.MINES = 32
+    gLevel.NAME = 'expert'
     onInit()
   }
 }

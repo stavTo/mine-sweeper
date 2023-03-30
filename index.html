@@ -22,15 +22,21 @@
         <input type="radio" name="level" class="expert" onclick="changeSize(this)">
     </div>
     
-    <div id="timerBox">
-        <span id="timer">00:00:00</span>
+    <div class="timerBox">
+        <span>Timer: </span><span class="timer">00:00:00</span>
+    </div>
+
+    <div>
+        <h3>Best Score: <span class="best-score"> 00:00</span></h3>
     </div>
 
     <h2 class="lives">Lives :<span>3</span></h2>
-    <h2 class="hints">Hints :<span class="num-of-hints">3</span><span><img src="img/hint.jpg"
-                onclick="hints(this)"></span></h2>
+    <h2 class="hints">Hints :<span class="num-of-hints">3</span><img src="img/hint.png"
+                onclick="hints(this)"></h2>
 
-
+        <div class="counter-flags">
+            <img src="/img/flag.png"><span>0</span>
+        </div>
 
     <button onclick="onInit()" class="smiley-btn">😄</button>
 
@@ -39,7 +45,7 @@
         <tbody class="board"></tbody>
     </table>
 
-    <button onclick="safeClick()">Safe Click :<span class="num-of-safeclick">3</span></button>
+    <button onclick="safeClick()" class="safe-click-btn">Safe Click :<span class="num-of-safeclick">3</span></button>
 
     <div class="modal">
         <h3 class="msg"></h3>
