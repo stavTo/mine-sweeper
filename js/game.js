@@ -6,7 +6,14 @@ var isHint
 var gLIVE = 3
 var gHintsCount = 3
 var gSafeClick = 3
+var gMegaHint = false
 var isFirstClick = true
+var gRowIdxStart
+var gColIdxStart
+var gRowIdxEnd
+var gColIdxEnd
+var gMegaHintCount
+var isManually = false
 
 const MINE_IMG = '<img src="img/mine.png">'
 
@@ -43,6 +50,12 @@ function resetGameData() {
     gHintsCount = 3
     gLIVE = 3
     gSafeClick = 3
+    gMegaHintCount = 1
+    gRowIdxStart = -1
+    gColIdxStart = -1
+    gRowIdxEnd = 0
+    gColIdxEnd = 0
+    isManually = false
     gGame = {
         isOn: true,
         shownCount: 0,
@@ -53,7 +66,7 @@ function resetGameData() {
 
 
 function buildBoard() {
-    setMinesRandom()
+    if (!isManually) setMinesRandom()
     for (var i = 0; i < gLevel.SIZE; i++) {
         for (var j = 0; j < gLevel.SIZE; j++) {
             gBoard[i][j].minesAroundCount = setMinesNegsCount(gBoard, i, j)
@@ -84,10 +97,8 @@ function renderBoard(board) {
         strHTML += '<tr>'
         for (var j = 0; j < board[0].length; j++) {
             var cellClass = getClassName({ i, j }) + ' '
-            strHTML += `<td class="cell ${cellClass}" onclick="onCellClicked(this,${i},${j})" oncontextmenu="onCellMarked(this,${i},${j})">
-            </td>` //maybe also event
-
-
+            strHTML += `<td data-i=${i} data-j=${j} class="cell ${cellClass}" onclick="onCellClicked(this,${i},${j})" oncontextmenu="onCellMarked(this,${i},${j})">
+            </td>`
         }
         strHTML += '</tr>'
     }
@@ -108,12 +119,24 @@ function setMinesNegsCount(board, rowIdx, colIdx) {
         }
     }
     return minesNegsCount
-
-
 }
 
 function onCellClicked(elCell, i, j) {
+    if (!gGame.isOn) return
     if (gBoard[i][j].isMarked) return
+    if (gBoard[i][j].isShown) return // to not count isShown again
+
+
+    if (isFirstClick && isManually && gLevel.MINES > 0) {
+        gBoard[i][j].isMine = true
+        renderCell(i, j)
+        gLevel.MINES--
+        if (!gLevel.MINES) {
+            setTimeout(closeAllMinesManuallyMode, 1000)
+            gBoard = buildBoard()
+        }
+        return
+    }
     if (isFirstClick) {
         isFirstClick = false
         startTimer()
@@ -121,20 +144,35 @@ function onCellClicked(elCell, i, j) {
         firstJ = j
         gBoard = buildBoard()
     }
-
-    if (gBoard[i][j].isShown) return // to not count isShown again
-
+    if (gMegaHint) {
+        if (gRowIdxStart === -1) {
+            gRowIdxStart = +elCell.dataset.i
+            gColIdxStart = +elCell.dataset.j
+            return
+        } else {
+            gRowIdxEnd = +elCell.dataset.i
+            gColIdxEnd = +elCell.dataset.j
+        }
+        megaHint(gRowIdxStart, gRowIdxEnd, gColIdxStart, gColIdxEnd)
+        const elMegaHint = document.querySelector('.mega-click-btn-on')
+        gMegaHint = false
+        megaHintBtn(elMegaHint)
+        gMegaHintCount = 0
+        return
+    }
     if (isHint && gHintsCount > 0) {
         openNeg(i, j)
         setTimeout(closeNeg, 1000, i, j)
         gHintsCount--
         updateHints()
-
+        !isHint
+        const elHint = document.querySelector('.hint-btn')
+        hints(elHint)
     } else {
         gGame.shownCount++
         gBoard[i][j].isShown = true
     }
-    if (!gBoard[i][j].isMine) { // equal to 0 
+    if (!gBoard[i][j].isMine) {
         expandShown(i, j)
     } else if (gBoard[i][j].isMine) {
         gLIVE--
@@ -145,6 +183,7 @@ function onCellClicked(elCell, i, j) {
 }
 
 function onCellMarked(elCell, i, j) {
+    if (!gGame.isOn) return
     if (gBoard[i][j].isShown) return
     if (gBoard[i][j].isMarked) {
         gBoard[i][j].isMarked = false
@@ -152,7 +191,6 @@ function onCellMarked(elCell, i, j) {
     } else {
         gBoard[i][j].isMarked = true
         gGame.markedCount++
-
     }
     elCell.classList.toggle('flag')
     updateFlags()
@@ -178,20 +216,15 @@ function setMinesRandom() {
     }
 }
 
-
 function checkGameOver() {
     var isVictory
     if (!gLIVE) {
         isVictory = false
         gameOver(isVictory)
-    } else {
-        if (gGame.shownCount + gGame.markedCount === gLevel.SIZE ** 2 && gGame.shownCount > gGame.markedCount) {
-            isVictory = true
-            gameOver(isVictory)
-        }
-
+    } else if (gGame.shownCount + gGame.markedCount === gLevel.SIZE ** 2 && gGame.shownCount > gGame.markedCount) {
+        isVictory = true
+        gameOver(isVictory)
     }
-
 }
 
 function gameOver(isVictory) {
@@ -200,9 +233,53 @@ function gameOver(isVictory) {
     var msg = isVictory ? 'You Won!!!' : 'Game Over'
     var elBtnSmiley = document.querySelector('.smiley-btn')
     elBtnSmiley.innerHTML = isVictory ? '😎' : '🤯'
+    openAllMinesGameOver()
     openModal(msg)
     if (isVictory) updateBestScore()
 
+}
+
+function openAllMinesGameOver() {
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[0].length; j++) {
+            const currCell = gBoard[i][j]
+            if (currCell.isMine) {
+                renderCell(i, j)
+            }
+        }
+    }
+}
+
+function closeAllMinesManuallyMode() {
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[0].length; j++) {
+            const currCell = gBoard[i][j]
+            if (currCell.isMine) {
+                deleteRenderCell(i, j)
+            }
+        }
+    }
+}
+
+function expandShown(rowIdx, colIdx) {
+    const currCell = gBoard[rowIdx][colIdx];
+    if (currCell.minesAroundCount > 0) {
+        renderCell(rowIdx, colIdx)
+        return
+    }
+    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+        if (i < 0 || i >= gBoard.length) continue
+        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+            if (i === rowIdx && j === colIdx) continue
+            if (j < 0 || j >= gBoard[0].length) continue
+            if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked && !isHint) {
+                gBoard[i][j].isShown = true
+                gGame.shownCount++
+                expandShown(i, j);
+            }
+            renderCell(i, j)
+        }
+    }
 }
 
 function updateBestScore() {
@@ -216,7 +293,7 @@ function updateBestScore() {
 
 function renderBestScore() {
     const bestScore = localStorage.getItem(gLevel.NAME)
-    var minutes = Math.floor(bestScore / (1000 * 60));
+    var minutes = Math.floor(bestScore / (1000 * 60))
     var seconds = Math.floor((bestScore % (1000 * 60)) / 1000);
     document.querySelector('h3 .best-score').innerText =
         formatTime(minutes) +
@@ -230,12 +307,16 @@ function updateLives() {
 }
 
 function updateHints() {
-    const elHint = document.querySelector('h2 .num-of-hints')
+    const elHint = document.querySelector('.num-of-hints')
     elHint.innerHTML = gHintsCount
 }
 function updateSafeClick() {
     const elSafeClick = document.querySelector('.num-of-safeclick')
     elSafeClick.innerHTML = gSafeClick
+}
+function updateFlags() {
+    const elFlag = document.querySelector('.counter-flags span')
+    elFlag.innerText = gGame.markedCount
 }
 
 
@@ -261,24 +342,6 @@ function closeNeg(rowIdx, colIdx) {
             if (j < 0 || j >= gBoard[0].length) continue
             deleteRenderCell(i, j)
         }
-    }
-}
-
-
-function hints(elHint) {
-    if (isFirstClick) return
-    if (gHintsCount <= 0) {
-        elHint.classList.remove('use-hint')
-        isHint = false
-        return
-    }
-    if (!isHint) {
-        elHint.classList.add('use-hint')
-        isHint = true
-    } else {
-        elHint.classList.remove('use-hint')
-        isHint = false
-
     }
 }
 
@@ -310,56 +373,36 @@ function findRandomSafeCell() {
     return safeCells[randIdx]
 }
 
-
-// function megaHint(rowIdxStart, rowIdxEnd, colIdxStart, colIdxEnd) {
-//     for (var i = rowIdxStart; i <= rowIdxEnd; i++) {
-//         for (var j = colIdxStart; j <= colIdxEnd; j++) {
-//             gBoard[i][j].isShown = true
-//             renderCell(i,j)
-//             setTimeout(deleteRenderCell,2000,i, j)
-//             gBoard[i][j].isShown = false
-//         }
-//     }
-// }
-
-function updateFlags() {
-    const elFlag = document.querySelector('.counter-flags span')
-    elFlag.innerText = gGame.markedCount
-}
-
-function numOfEmptyNeg(rowIdx, colIdx) {
-    var count = 0
-    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
-        if (i < 0 || i >= gBoard.length) continue
-        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
-            if (i === rowIdx && j === colIdx) continue
-            if (j < 0 || j >= gBoard[0].length) continue
-            if (gBoard[i][j].minesAroundCount === 0) {
-                count++
-            }
-        }
-    }
-    return count
-}
-
-function expandShown(rowIdx, colIdx) {
-    const currCell = gBoard[rowIdx][colIdx];
-    if (currCell.minesAroundCount > 0) {
-        renderCell(rowIdx, colIdx)
+function hints(elHint) {
+    if (isFirstClick) return
+    if (gHintsCount > 0) {
+        elHint.classList.toggle('use-hint')
+        isHint = !isHint
+    } else if (!gHintsCount) {
+        elHint.classList.remove('use-hint')
         return
     }
-    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
-        if (i < 0 || i >= gBoard.length) continue
-        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
-            if (i === rowIdx && j === colIdx) continue
-            if (j < 0 || j >= gBoard[0].length) continue
-            if (!gBoard[i][j].isShown && !gBoard[i][j].isMarked && !isHint) {
-                gBoard[i][j].isShown = true
-                gGame.shownCount++
-                expandShown(i, j);
-            }
+}
 
+function megaHintBtn(elBtnMegaHint) {
+    if (isFirstClick || !gMegaHintCount) return
+    gMegaHint = !gMegaHint
+    elBtnMegaHint.classList.toggle('mega-click-btn-on')
+}
+
+function megaHint(rowIdxStart, rowIdxEnd, colIdxStart, colIdxEnd) {
+    for (var i = rowIdxStart; i <= rowIdxEnd; i++) {
+        for (var j = colIdxStart; j <= colIdxEnd; j++) {
             renderCell(i, j)
+            setTimeout(deleteRenderCell, 2000, i, j)
         }
     }
 }
+
+function manuallyPositioned(elBtnManually) {
+    if (isFirstClick) {
+        if (isManually === false) isManually = true
+        elBtnManually.classList.add('manually-positioned-btn-on')
+    }
+}
+

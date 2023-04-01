@@ -11,19 +11,6 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min) + min)
 }
 
-// function renderCell(i, j) {
-//   const elCell = document.querySelector(`.cell-${i}-${j}`)
-//   elCell.classList.add('shown')
-//   if (gBoard[i][j].isMine && isHint) {
-//     elCell.innerHTML = MINE_IMG
-//   }
-//   if (gBoard[i][j].minesAroundCount === 0 || gBoard[i][j].isMarked) return
-//   elCell.innerHTML = gBoard[i][j].minesAroundCount
-// }
-
-
-
-
 function openModal(msg) {
   const elModal = document.querySelector('.modal')
   const elSpan = elModal.querySelector('.msg')

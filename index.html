@@ -10,47 +10,49 @@
 </head>
 
 <body onload="onInit()">
-    <h1>Mine Sweeper</h1>
-
-    
-    <div>
-        <label>Beginner(2 mines): </label>
-        <input type="radio" name="level" class="beginner" onclick="changeSize(this)">
-        <label>Medium(14 mines) </label>
-        <input type="radio" name="level" class="medium" onclick="changeSize(this)">
-        <label>Expert(32 mines)</label>
-        <input type="radio" name="level" class="expert" onclick="changeSize(this)">
-    </div>
-    
-    <div class="timerBox">
-        <span>Timer: </span><span class="timer">00:00:00</span>
-    </div>
+    <h1 class="headline">Mine Sweeper</h1>
 
     <div>
-        <h3>Best Score: <span class="best-score"> 00:00</span></h3>
+        <button class="beginner" onclick="changeSize(this)">Beginner (2 mines)</button>
+        <button class="medium" onclick="changeSize(this)">Medium (14 mines)</button>
+        <button class="expert" onclick="changeSize(this)">Expert (32 mines)</button>
+
+
     </div>
 
-    <h2 class="lives">Lives :<span>3</span></h2>
-    <h2 class="hints">Hints :<span class="num-of-hints">3</span><img src="img/hint.png"
-                onclick="hints(this)"></h2>
+    <div class="life-hint counter-flags">
+        <img src="img/life.png" class="lives"><span class="lives">Lives: <span> 3</span></span>
+        <img src="img/flag.png"><span>0</span>
+    </div>
 
-        <div class="counter-flags">
-            <img src="img/flag.png"><span>0</span>
-        </div>
+
+    <button class="hint-btn" onclick="hints(this)"><img src="img/hint.png" class="hints"></button>
+     </br> 
+    <span >Hints: <span class="hints num-of-hints"> 3</span></span> </br>
+
 
     <button onclick="onInit()" class="smiley-btn">😄</button>
 
+    <div class="timerBox">
+        <span>Timer: </span><span class="timer">00:00:00</span>
+    </div>
 
     <table>
         <tbody class="board"></tbody>
     </table>
 
     <button onclick="safeClick()" class="safe-click-btn">Safe Click :<span class="num-of-safeclick">3</span></button>
+    <button onclick="megaHintBtn(this)" class="mega-click-btn ">Mega Hint</button>
+    <button onclick="manuallyPositioned(this)" class="manually-positioned-btn ">manually positioned Mode Hint</button>
+
+    <div>
+        <h3>Best Score: <span class="best-score"> 00:00</span></h3>
+    </div>
 
     <div class="modal">
         <h3 class="msg"></h3>
     </div>
-
+    <h3 class="signature"> made by Stav Tohami</h3>
     <script src="js/utils.js"></script>
     <script src="js/timer.js"></script>
     <script src="js/game.js"></script>
